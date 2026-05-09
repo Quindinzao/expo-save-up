@@ -13,6 +13,10 @@ interface Category {
 export const categoriesRepository = {
     ...base,
 
+    getAll: (): Category[] => {
+        return db.getAllSync(`SELECT * FROM categories`) as Category[];
+    },
+
     insert: (category: Category) => {
         db.runSync(
             `INSERT INTO categories (id, name, icon, color, created_at)

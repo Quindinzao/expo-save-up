@@ -14,15 +14,16 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     text: {
         color: theme.colors.fixedText,
     },
+    textOutline: {
+        color: theme.colors.text,
+    },
     primary: {
         backgroundColor: theme.colors.primary,
     },
     secondary: {
         backgroundColor: theme.colors.item,
     },
-    outline: {
+    transparent: {
         backgroundColor: 'transparent',
-        borderWidth: theme.spacing.s01,
-        borderColor: theme.colors.border,
     },
 })

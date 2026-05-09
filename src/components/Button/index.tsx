@@ -6,7 +6,7 @@ import { useTheme } from "../../hooks/useTheme";
 
 interface ButtonProps {
     children: React.ReactNode;
-    variant: 'primary' | 'secondary' | 'outline';
+    variant: 'primary' | 'secondary' | 'transparent';
     onPress: () => void;
     style?: StyleProp<ViewStyle>;
 }
@@ -21,7 +21,7 @@ export default function Button({ children, variant, onPress, style }: ButtonProp
             activeOpacity={0.7}
             onPress={onPress}
         >
-            <Typography variant="h4" style={styles.text}>{children}</Typography>
+            <Typography variant="h4" style={variant !== 'primary' ? styles.textOutline : styles.text}>{children}</Typography>
         </TouchableOpacity>
     )
 }

@@ -6,6 +6,7 @@ import Home from './screens/Home';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { StyleSheet, View } from 'react-native';
 import { Routes } from './routes/Routes';
+import { initDatabase } from './database/db';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,6 +16,7 @@ export default function App() {
   useEffect(() => {
     async function prepare() {
       try {
+        initDatabase();
         await Font.loadAsync({
           'Montserrat-Thin': require('./assets/fonts/Montserrat-Thin.ttf'),
           'Montserrat-ThinItalic': require('./assets/fonts/Montserrat-ThinItalic.ttf'),

@@ -67,9 +67,11 @@ export const expensesRepository = {
 
     getByDate: (date: string) => {
         return db.getAllSync(
-            `SELECT * FROM expenses
-       WHERE date = ?
-       ORDER BY created_at DESC`,
+            `SELECT e.*, c.name as category_name, c.icon as category_icon, c.color as category_color
+       FROM expenses e
+       LEFT JOIN categories c ON e.category_id = c.id
+       WHERE e.date = ?
+       ORDER BY e.created_at DESC`,
             [date]
         );
     },
@@ -104,5 +106,17 @@ export const expensesRepository = {
         );
 
         return result?.total ?? 0;
+    },
+
+    getDaysByMonth: (month: string): { date: string; total: number }[] => {
+        // formato: "2026-04"
+        return db.getAllSync<{ date: string; total: number }>(
+            `SELECT date, SUM(amount) as total
+       FROM expenses
+       WHERE substr(date, 1, 7) = ?
+       GROUP BY date
+       ORDER BY date DESC`,
+            [month]
+        );
     },
 };

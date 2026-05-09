@@ -3,7 +3,7 @@ import { Theme } from "../../styles/theme";
 
 const { width } = Dimensions.get("window");
 
-export const createStyles = (theme: Theme, variant: "default" | "error") => {
+export const createStyles = (theme: Theme, variant: "default" | "error", iconColor?: string) => {
     return StyleSheet.create({
         wrapper: {
             width: width - theme.spacing.s32,
@@ -22,14 +22,14 @@ export const createStyles = (theme: Theme, variant: "default" | "error") => {
             borderColor: variant === "error" ? theme.colors.error + "50" : theme.colors.border,
         },
         dayText: {
-            color: variant === "error" ? theme.colors.error : theme.colors.primary,
+            color: variant === "error" ? theme.colors.error : iconColor || theme.colors.primary,
         },
         iconContainer: {
             width: theme.spacing.s48,
             height: theme.spacing.s48,
             borderRadius: theme.radius.full,
             backgroundColor:
-                variant === "error" ? theme.colors.error + "10" : theme.colors.primary + "20",
+                variant === "error" ? theme.colors.error + "10" : iconColor ? iconColor + "20" : theme.colors.primary + "20",
             justifyContent: "center",
             alignItems: "center",
             marginRight: theme.spacing.s16,

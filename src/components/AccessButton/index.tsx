@@ -16,6 +16,7 @@ interface AccessButtonProps {
     onPress?: () => void;
     style?: StyleProp<ViewStyle>;
     variant?: "default" | "error";
+    iconColor?: string;
 }
 
 export default function AccessButton({
@@ -26,6 +27,7 @@ export default function AccessButton({
     icon,
     onPress,
     style,
+    iconColor,
     variant = "default",
 }: AccessButtonProps) {
     const { theme } = useTheme();
@@ -46,7 +48,7 @@ export default function AccessButton({
                         {icon && <MaterialCommunityIcons
                             name={icon}
                             size={theme.spacing.s32}
-                            color={variant === "error" ? theme.colors.error : theme.colors.primary}
+                            color={variant === "error" ? theme.colors.error : iconColor || theme.colors.primary}
                         />}
                         {day && <Typography variant="h3" style={styles.dayText}>{day}</Typography>}
                     </View>

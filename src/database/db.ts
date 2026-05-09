@@ -10,7 +10,7 @@ export function initDatabase() {
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       profession TEXT,
-      salary REAL,
+      salary REAL
     );
 
     CREATE TABLE IF NOT EXISTS categories (
@@ -37,5 +37,11 @@ export function initDatabase() {
 
     CREATE INDEX IF NOT EXISTS idx_expenses_date ON expenses(date);
     CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category_id);
+
+    INSERT OR IGNORE INTO users (id, name, profession, salary)
+    VALUES ('1', 'Usuário', '', 0);
+
+    INSERT OR IGNORE INTO categories (id, name, icon, color, created_at)
+    VALUES ('1', 'Geral', 'cash', '#FFB700', datetime('now'));
   `);
 }

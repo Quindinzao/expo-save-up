@@ -1,5 +1,7 @@
 export function createBaseRepository(table: string, db: any) {
     return {
+        table,
+        db,
         getAll: () => {
             return db.getAllSync(`SELECT * FROM ${table}`);
         },
