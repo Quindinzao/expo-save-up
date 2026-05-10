@@ -14,4 +14,7 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     title: {
         flex: 1,
     },
+    rightButton: {
+        marginLeft: theme.spacing.s16,
+    },
 });

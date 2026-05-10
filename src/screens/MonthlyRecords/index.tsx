@@ -5,7 +5,7 @@ import { useTheme } from "../../hooks/useTheme";
 import AccessButton from "../../components/AccessButton";
 import Typography from "../../components/Typography";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { recordsRepository } from "../../database/repositories/recordsRepository";
 import Header from "../../components/Header";
@@ -33,8 +33,13 @@ export default function MonthlyRecords() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const navigation = useNavigation<NativeStackNavigationProp<any>>();
+    const route = useRoute<RouteProp<{ params: { month?: number; year?: number } }>>();
 
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const initialDate = route.params?.year && route.params?.month !== undefined 
+        ? new Date(route.params.year, route.params.month) 
+        : new Date();
+
+    const [selectedDate, setSelectedDate] = useState(initialDate);
     const [days, setDays] = useState<DayEntry[]>([]);
     const [monthTotals, setMonthTotals] = useState({ income: 0, outcome: 0 });
 
@@ -62,9 +67,33 @@ export default function MonthlyRecords() {
 
     const balance = monthTotals.income - monthTotals.outcome;
 
+    const handleAddRecord = () => {
+        const today = new Date();
+        let targetDate: string;
+        
+        if (selectedDate.getFullYear() === today.getFullYear() && selectedDate.getMonth() === today.getMonth()) {
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, "0");
+            const dd = String(today.getDate()).padStart(2, "0");
+            targetDate = `${yyyy}-${mm}-${dd}`;
+        } else {
+            const yyyy = selectedDate.getFullYear();
+            const mm = String(selectedDate.getMonth() + 1).padStart(2, "0");
+            targetDate = `${yyyy}-${mm}-01`;
+        }
+        navigation.navigate("AddRecord", { date: targetDate });
+    };
+
     return (
         <SafeAreaView style={styles.container}>
-            <Header title="Registros do Mês" onBack={() => navigation.goBack()} />
+            <Header 
+                title="Registros do Mês" 
+                onBack={() => navigation.goBack()} 
+                rightAction={{
+                    icon: "plus",
+                    onPress: handleAddRecord
+                }}
+            />
 
             <View style={styles.header}>
                 <View style={styles.selectors}>

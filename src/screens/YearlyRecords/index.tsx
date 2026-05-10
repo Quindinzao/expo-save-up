@@ -115,7 +115,7 @@ export default function YearlyRecords() {
                     <AccessButton
                         title={getMonthName(item.month)}
                         icon={ZODIAC_ICONS[item.month]}
-                        onPress={(item.income > 0 || item.outcome > 0) ? () => navigation.navigate("MonthlyRecords", { month: item.month }) : undefined}
+                        onPress={(item.income > 0 || item.outcome > 0) ? () => navigation.navigate("MonthlyRecords", { month: item.month, year: selectedYear }) : undefined}
                     >
                         {formatCurrency(item.income - item.outcome)}
                     </AccessButton>

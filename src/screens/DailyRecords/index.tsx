@@ -9,6 +9,8 @@ import { useTheme } from "../../hooks/useTheme";
 import Typography from "../../components/Typography";
 import Button from "../../components/Button";
 import { recordsRepository } from "../../database/repositories/recordsRepository";
+import Header from "../../components/Header";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type DailyRecordsRouteProp = RouteProp<{ DailyRecords: { date: string } }, 'DailyRecords'>;
 
@@ -42,7 +44,7 @@ function formatDate(dateStr: string): string {
 export default function DailyRecords() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
-    const navigation = useNavigation();
+    const navigation = useNavigation<NativeStackNavigationProp<any>>();
     const route = useRoute<DailyRecordsRouteProp>();
     const { date } = route.params;
 
@@ -59,8 +61,16 @@ export default function DailyRecords() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Typography variant="h1" style={styles.title}>
-                Registros de {formatDate(date)}
+            <Header 
+                title="Registros do Dia" 
+                onBack={() => navigation.goBack()} 
+                rightAction={{
+                    icon: "plus",
+                    onPress: () => navigation.navigate("AddRecord", { date: date })
+                }}
+            />
+            <Typography variant="h2" style={[styles.title, { paddingHorizontal: 16, marginTop: 8 }]}>
+                {formatDate(date)}
             </Typography>
 
             <FlatList<RecordWithCategory>

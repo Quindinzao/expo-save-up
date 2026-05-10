@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
 import TextField from "../../components/TextField";
@@ -26,12 +26,14 @@ export default function AddRecord() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const navigation = useNavigation();
+    const route = useRoute<RouteProp<{ params: { date?: string } }>>();
 
     const [type, setType] = useState<"incoming" | "outgoing">("outgoing");
     const [name, setName] = useState("");
     const [amountText, setAmountText] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [categoryOptions, setCategoryOptions] = useState<DropdownOption[]>([]);
+    const [date, setDate] = useState(route.params?.date || todayISO());
     const [repeat, setRepeat] = useState<string | null>(null);
     const [repeatUntil, setRepeatUntil] = useState<string | null>(null);
 
@@ -84,7 +86,7 @@ export default function AddRecord() {
                 description: "",
                 amount: parsed,
                 type: type,
-                date: todayISO(),
+                date: date,
                 repeat: repeat === "none" ? null : (repeat as any),
                 repeat_until: repeat === "none" ? null : repeatUntil,
                 created_at: new Date().toISOString(),
@@ -134,6 +136,12 @@ export default function AddRecord() {
                     value={categoryId}
                     placeholder="Selecione uma categoria..."
                     onChange={(opt) => setCategoryId(opt.value)}
+                />
+
+                <DateField
+                    label="Data do Registro"
+                    value={date}
+                    onChange={setDate}
                 />
 
                 <Dropdown

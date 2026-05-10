@@ -84,7 +84,11 @@ export default function Home() {
 
                         <TouchableOpacity 
                             style={styles.menuItem} 
-                            onPress={() => navigation.navigate("AddRecord")}
+                            onPress={() => {
+                                const d = new Date();
+                                const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                                navigation.navigate("AddRecord", { date: todayStr });
+                            }}
                         >
                             <MaterialCommunityIcons name="cash-plus" size={32} color={theme.colors.primary} style={styles.menuIcon} />
                             <Typography variant="h4" style={styles.menuLabel}>Novo Registro</Typography>
