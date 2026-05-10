@@ -44,7 +44,7 @@ export function initDatabase() {
     CREATE INDEX IF NOT EXISTS idx_records_category ON records(category_id);
 
     INSERT OR IGNORE INTO users (id, name, profession)
-    VALUES ('1', 'Usuário', '');
+    VALUES ('1', '', '');
 
     INSERT OR IGNORE INTO categories (id, name, icon, color, type, created_at)
     VALUES ('1', 'Geral', 'cash', '#FFB700', 'outgoing', datetime('now'));
