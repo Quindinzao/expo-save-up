@@ -11,6 +11,7 @@ import { categoriesRepository } from "../../database/repositories/categoryReposi
 import FormBody from "../../components/FormBody";
 import FormFooter from "../../components/FormFooter";
 import Header from "../../components/Header";
+import DateField from "../../components/DateField";
 
 /** Retorna a data de hoje no formato YYYY-MM-DD (compatível com as queries do banco) */
 function todayISO(): string {
@@ -30,6 +31,15 @@ export default function AddExpense() {
     const [amountText, setAmountText] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [categoryOptions, setCategoryOptions] = useState<DropdownOption[]>([]);
+    const [repeat, setRepeat] = useState<string | null>(null);
+    const [repeatUntil, setRepeatUntil] = useState<string | null>(null);
+
+    const repeatOptions: DropdownOption[] = [
+        { label: "Não se repete", value: "none" },
+        { label: "Diariamente", value: "daily" },
+        { label: "Mensalmente", value: "monthly" },
+        { label: "Anualmente", value: "yearly" },
+    ];
 
     useEffect(() => {
         const cats = categoriesRepository.getAll();
@@ -64,6 +74,8 @@ export default function AddExpense() {
                 description: "",
                 amount: parsed,
                 date: todayISO(),
+                repeat: repeat === "none" ? null : (repeat as any),
+                repeat_until: repeat === "none" ? null : repeatUntil,
                 created_at: new Date().toISOString(),
                 edited_at: "",
             });
@@ -105,7 +117,25 @@ export default function AddExpense() {
                     placeholder="Selecione uma categoria..."
                     onChange={(opt) => setCategoryId(opt.value)}
                 />
+
+                <Dropdown
+                    label="Repetição"
+                    options={repeatOptions}
+                    value={repeat || "none"}
+                    onChange={(opt) => setRepeat(opt.value)}
+                />
+
+                {repeat && repeat !== "none" && (
+                    <DateField
+                        label="Repetir até"
+                        placeholder="Sem data de término"
+                        value={repeatUntil}
+                        onChange={setRepeatUntil}
+                        onClear={() => setRepeatUntil(null)}
+                    />
+                )}
             </FormBody>
+
 
             <FormFooter
                 textButton="Salvar Despesa"

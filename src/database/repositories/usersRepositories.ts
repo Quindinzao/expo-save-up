@@ -5,7 +5,6 @@ interface User {
     id: string;
     name: string;
     profession: string;
-    salary: number;
 }
 
 const base = createBaseRepository("users", db);
@@ -15,13 +14,12 @@ export const usersRepository = {
 
     insert: (user: User) => {
         db.runSync(
-            `INSERT INTO users (id, name, profession, salary)
-       VALUES (?, ?, ?, ?)`,
+            `INSERT INTO users (id, name, profession)
+       VALUES (?, ?, ?)`,
             [
                 user.id,
                 user.name,
                 user.profession,
-                user.salary,
             ]
         );
     },
@@ -29,12 +27,11 @@ export const usersRepository = {
     update: (user: User) => {
         db.runSync(
             `UPDATE users
-       SET name = ?, profession = ?, salary = ?
+       SET name = ?, profession = ?
        WHERE id = ?`,
             [
                 user.name,
                 user.profession,
-                user.salary,
                 user.id,
             ]
         );
