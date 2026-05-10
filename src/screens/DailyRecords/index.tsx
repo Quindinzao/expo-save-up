@@ -11,6 +11,7 @@ import Button from "../../components/Button";
 import { recordsRepository, TransactionRecord } from "../../database/repositories/recordsRepository";
 import Header from "../../components/Header";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import FormFooter from "../../components/FormFooter";
 
 type DailyRecordsRouteProp = RouteProp<{ DailyRecords: { date: string } }, 'DailyRecords'>;
 
@@ -59,9 +60,9 @@ export default function DailyRecords() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <Header 
-                title="Registros do Dia" 
-                onBack={() => navigation.goBack()} 
+            <Header
+                title="Registros do Dia"
+                onBack={() => navigation.goBack()}
                 rightAction={{
                     icon: "plus",
                     onPress: () => navigation.navigate("AddRecord", { date: date })
@@ -77,7 +78,7 @@ export default function DailyRecords() {
                 data={records}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         style={styles.expenseItem}
                         onPress={() => navigation.navigate("AddRecord", { record: item })}
                         activeOpacity={0.7}
@@ -93,10 +94,10 @@ export default function DailyRecords() {
                             <Typography variant="h4" style={styles.expenseName}>{item.name}</Typography>
                             <Typography variant="caption">{item.category_name}</Typography>
                         </View>
-                        <Typography 
-                            variant="h4" 
+                        <Typography
+                            variant="h4"
                             style={[
-                                styles.amount, 
+                                styles.amount,
                                 { color: item.type === "incoming" ? "#4CAF50" : theme.colors.text }
                             ]}
                         >
@@ -112,12 +113,10 @@ export default function DailyRecords() {
                     </View>
                 }
             />
-
-            <View style={styles.footer}>
-                <Button variant="primary" onPress={() => navigation.goBack()}>
-                    Voltar
-                </Button>
-            </View>
+            <FormFooter
+                onPressButton={() => navigation.goBack()}
+                textButton="Voltar para a tela inicial"
+            />
         </SafeAreaView>
     );
 }

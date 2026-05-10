@@ -42,11 +42,6 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
         paddingBottom: theme.spacing.s32,
         gap: theme.spacing.s16,
     },
-    footer: {
-        alignItems: 'center',
-        paddingHorizontal: theme.spacing.s24,
-        paddingBottom: theme.spacing.s24,
-    },
     emptyContainer: {
         flex: 1,
         alignItems: 'center',

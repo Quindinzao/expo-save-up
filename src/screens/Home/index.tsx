@@ -64,10 +64,15 @@ export default function Home() {
         <SafeAreaView style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <Typography variant="body" style={styles.greeting}>Olá, bem-vindo ao</Typography>
-                    <Typography variant="h1" style={styles.title}>
-                        SaveUp
-                    </Typography>
+                    <View style={{ flex: 1 }}>
+                        <Typography variant="body" style={styles.greeting}>Olá, bem-vindo ao</Typography>
+                        <Typography variant="h1" style={styles.title}>
+                            SaveUp
+                        </Typography>
+                    </View>
+                    <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+                        <MaterialCommunityIcons name="account-circle-outline" size={36} color={theme.colors.text} />
+                    </TouchableOpacity>
                 </View>
 
                 <BarChart

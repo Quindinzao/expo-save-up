@@ -19,7 +19,4 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     input: {
         marginTop: theme.spacing.s16,
     },
-    footer: {
-        marginTop: theme.spacing.s48,
-    }
 });

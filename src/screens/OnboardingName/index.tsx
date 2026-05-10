@@ -7,6 +7,7 @@ import { useTheme } from "../../hooks/useTheme";
 import Typography from "../../components/Typography";
 import TextField from "../../components/TextField";
 import Button from "../../components/Button";
+import FormFooter from "../../components/FormFooter";
 
 export default function OnboardingName() {
     const { theme } = useTheme();
@@ -44,12 +45,10 @@ export default function OnboardingName() {
                         onSubmitEditing={handleNext}
                         style={styles.input}
                     />
-
-                    <View style={styles.footer}>
-                        <Button variant="primary" onPress={handleNext}>
-                            Próximo
-                        </Button>
-                    </View>
+                    <FormFooter
+                        onPressButton={handleNext}
+                        textButton="Próximo"
+                    />
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>

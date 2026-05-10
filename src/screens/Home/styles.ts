@@ -12,6 +12,8 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
     header: {
         paddingHorizontal: theme.spacing.s16,
         paddingVertical: theme.spacing.s24,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
     greeting: {
         color: theme.colors.placeholder,

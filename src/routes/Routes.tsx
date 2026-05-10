@@ -8,6 +8,7 @@ import MonthlyRecords from "../screens/MonthlyRecords";
 import YearlyRecords from "../screens/YearlyRecords";
 import OnboardingName from "../screens/OnboardingName";
 import OnboardingProfession from "../screens/OnboardingProfession";
+import Profile from "../screens/Profile";
 import { usersRepository } from "../database/repositories/usersRepositories";
 
 
@@ -26,6 +27,7 @@ export function Routes() {
                 <Stack.Screen name="OnboardingName" component={OnboardingName} />
                 <Stack.Screen name="OnboardingProfession" component={OnboardingProfession} />
                 <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="Profile" component={Profile} />
                 <Stack.Screen name="AddRecord" component={AddRecord} />
                 <Stack.Screen name="AddCategory" component={AddCategory} />
                 <Stack.Screen name="DailyRecords" component={DailyRecords} />

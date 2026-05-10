@@ -8,6 +8,7 @@ import Typography from "../../components/Typography";
 import TextField from "../../components/TextField";
 import Button from "../../components/Button";
 import { usersRepository } from "../../database/repositories/usersRepositories";
+import FormFooter from "../../components/FormFooter";
 
 type RouteParams = {
     params: {
@@ -71,11 +72,10 @@ export default function OnboardingProfession() {
                         style={styles.input}
                     />
 
-                    <View style={styles.footer}>
-                        <Button variant="primary" onPress={handleFinish}>
-                            Finalizar
-                        </Button>
-                    </View>
+                    <FormFooter
+                        onPressButton={handleFinish}
+                        textButton="Finalizar"
+                    />
                 </View>
             </KeyboardAvoidingView>
         </SafeAreaView>
