@@ -9,7 +9,7 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
         backgroundColor: theme.colors.item,
         borderRadius: theme.radius.md,
         paddingHorizontal: theme.spacing.s08,
-        paddingVertical: theme.spacing.s04,
+        paddingVertical: theme.spacing.s08,
         borderWidth: 1,
         borderColor: theme.colors.border,
     },

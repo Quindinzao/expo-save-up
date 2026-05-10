@@ -6,11 +6,11 @@ import Typography from "../../components/Typography";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { expensesRepository } from "../../database/repositories/expensesRepository";
+import { recordsRepository } from "../../database/repositories/recordsRepository";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import BarChart from "../../components/BarChart";
 
-type MonthData = { month: string; total: number; label: string };
+type MonthData = { month: string; income: number; outcome: number; label: string };
 
 export default function Home() {
     const { theme } = useTheme();
@@ -23,7 +23,7 @@ export default function Home() {
 
     function loadDashboardData() {
         const yearStr = currentYear.toString();
-        const results = expensesRepository.getYearlyTotalsGroupedByMonth(yearStr);
+        const results = recordsRepository.getYearlyTotalsGroupedByMonth(yearStr);
         
         const data: MonthData[] = Array.from({ length: 12 }, (_, i) => {
             const monthIndex = i + 1;
@@ -32,12 +32,13 @@ export default function Home() {
             const date = new Date(currentYear, i);
             return {
                 month: monthStr,
-                total: found ? found.total : 0,
+                income: found ? found.income : 0,
+                outcome: found ? found.outcome : 0,
                 label: date.toLocaleString("pt-BR", { month: "short" }).replace('.', '')
             };
         });
 
-        const max = Math.max(...data.map(d => d.total), 1); // avoid division by zero
+        const max = Math.max(...data.map(d => d.outcome), 1); // avoid division by zero
         setYearlyData(data);
         setMaxTotal(max);
     }
@@ -57,8 +58,8 @@ export default function Home() {
                 </View>
 
                 <BarChart 
-                    title={`Gastos de ${currentYear}`}
-                    data={yearlyData.map(d => ({ label: d.label, value: d.total }))}
+                    title={`Despesas de ${currentYear}`}
+                    data={yearlyData.map(d => ({ label: d.label, value: d.outcome }))}
                     maxTotal={maxTotal}
                     style={styles.chartSection}
                 />
@@ -78,15 +79,15 @@ export default function Home() {
                             onPress={() => navigation.navigate("YearlyRecords")}
                         >
                             <MaterialCommunityIcons name="calendar-range" size={32} color={theme.colors.primary} style={styles.menuIcon} />
-                            <Typography variant="h4" style={styles.menuLabel}>Gastos do Ano</Typography>
+                            <Typography variant="h4" style={styles.menuLabel}>Registros do Ano</Typography>
                         </TouchableOpacity>
 
                         <TouchableOpacity 
                             style={styles.menuItem} 
-                            onPress={() => navigation.navigate("AddExpense")}
+                            onPress={() => navigation.navigate("AddRecord")}
                         >
                             <MaterialCommunityIcons name="cash-plus" size={32} color={theme.colors.primary} style={styles.menuIcon} />
-                            <Typography variant="h4" style={styles.menuLabel}>Adicionar Despesa</Typography>
+                            <Typography variant="h4" style={styles.menuLabel}>Novo Registro</Typography>
                         </TouchableOpacity>
 
                         <TouchableOpacity 

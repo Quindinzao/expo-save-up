@@ -7,13 +7,13 @@ import Typography from "../../components/Typography";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { expensesRepository } from "../../database/repositories/expensesRepository";
+import { recordsRepository } from "../../database/repositories/recordsRepository";
 import Header from "../../components/Header";
 import Selector from "../../components/Selector";
 import SummaryCard from "../../components/SummaryCard";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-type MonthEntry = { month: number; total: number };
+type MonthEntry = { month: number; income: number; outcome: number };
 
 function formatCurrency(value: number): string {
     return value.toLocaleString("pt-BR", {
@@ -53,20 +53,27 @@ export default function YearlyRecords() {
 
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
     const [months, setMonths] = useState<MonthEntry[]>([]);
-    const [yearTotal, setYearTotal] = useState(0);
+    const [yearTotals, setYearTotals] = useState({ income: 0, outcome: 0 });
 
     function loadData() {
         const yearStr = selectedYear.toString();
-        const results = expensesRepository.getYearlyTotalsGroupedByMonth(yearStr);
+        const results = recordsRepository.getYearlyTotalsGroupedByMonth(yearStr);
+
+        let totalIncome = 0;
+        let totalOutcome = 0;
 
         const allMonths: MonthEntry[] = Array.from({ length: 12 }, (_, i) => {
             const monthStr = `${yearStr}-${(i + 1).toString().padStart(2, '0')}`;
             const found = results.find(r => r.month === monthStr);
-            return { month: i, total: found ? found.total : 0 };
+            const income = found ? found.income : 0;
+            const outcome = found ? found.outcome : 0;
+            totalIncome += income;
+            totalOutcome += outcome;
+            return { month: i, income, outcome };
         });
 
         setMonths(allMonths);
-        setYearTotal(expensesRepository.getTotalByYear(yearStr));
+        setYearTotals({ income: totalIncome, outcome: totalOutcome });
     }
 
     useEffect(() => {
@@ -77,9 +84,11 @@ export default function YearlyRecords() {
         setSelectedYear(prev => prev + offset);
     };
 
+    const yearBalance = yearTotals.income - yearTotals.outcome;
+
     return (
         <SafeAreaView style={styles.container}>
-            <Header title="Gastos do Ano" onBack={() => navigation.goBack()} />
+            <Header title="Registros do Ano" onBack={() => navigation.goBack()} />
 
             <View style={styles.header}>
                 <View style={styles.selectors}>
@@ -91,8 +100,8 @@ export default function YearlyRecords() {
                 </View>
 
                 <SummaryCard
-                    label="Total no ano"
-                    value={formatCurrency(yearTotal)}
+                    label="Saldo no ano"
+                    value={formatCurrency(yearBalance)}
                     style={styles.totalCard}
                 />
             </View>
@@ -106,10 +115,9 @@ export default function YearlyRecords() {
                     <AccessButton
                         title={getMonthName(item.month)}
                         icon={ZODIAC_ICONS[item.month]}
-                        onPress={item.total > 0 ? () => {
-                        } : undefined}
+                        onPress={(item.income > 0 || item.outcome > 0) ? () => navigation.navigate("MonthlyRecords", { month: item.month }) : undefined}
                     >
-                        {formatCurrency(item.total)}
+                        {formatCurrency(item.income - item.outcome)}
                     </AccessButton>
                 )}
             />

@@ -8,14 +8,15 @@ import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
 import Typography from "../../components/Typography";
 import Button from "../../components/Button";
-import { expensesRepository } from "../../database/repositories/expensesRepository";
+import { recordsRepository } from "../../database/repositories/recordsRepository";
 
-type DailyExpensesRouteProp = RouteProp<{ DailyExpenses: { date: string } }, 'DailyExpenses'>;
+type DailyRecordsRouteProp = RouteProp<{ DailyRecords: { date: string } }, 'DailyRecords'>;
 
-interface ExpenseWithCategory {
+interface RecordWithCategory {
     id: string;
     name: string;
     amount: number;
+    type: "incoming" | "outgoing";
     category_name: string;
     category_icon: string;
     category_color: string;
@@ -38,34 +39,34 @@ function formatDate(dateStr: string): string {
     });
 }
 
-export default function DailyExpenses() {
+export default function DailyRecords() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const navigation = useNavigation();
-    const route = useRoute<DailyExpensesRouteProp>();
+    const route = useRoute<DailyRecordsRouteProp>();
     const { date } = route.params;
 
-    const [expenses, setExpenses] = useState<ExpenseWithCategory[]>([]);
+    const [records, setRecords] = useState<RecordWithCategory[]>([]);
 
-    function loadExpenses() {
-        const result = expensesRepository.getByDate(date) as ExpenseWithCategory[];
-        setExpenses(result);
+    function loadRecords() {
+        const result = recordsRepository.getByDate(date) as RecordWithCategory[];
+        setRecords(result);
     }
 
     useEffect(() => {
-        loadExpenses();
+        loadRecords();
     }, [date]);
 
     return (
         <SafeAreaView style={styles.container}>
             <Typography variant="h1" style={styles.title}>
-                Gastos de {formatDate(date)}
+                Registros de {formatDate(date)}
             </Typography>
 
-            <FlatList<ExpenseWithCategory>
+            <FlatList<RecordWithCategory>
                 style={styles.list}
-                contentContainerStyle={expenses.length === 0 ? { flex: 1 } : styles.listContent}
-                data={expenses}
+                contentContainerStyle={records.length === 0 ? { flex: 1 } : styles.listContent}
+                data={records}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.expenseItem}>
@@ -80,13 +81,21 @@ export default function DailyExpenses() {
                             <Typography variant="h4" style={styles.expenseName}>{item.name}</Typography>
                             <Typography variant="caption">{item.category_name}</Typography>
                         </View>
-                        <Typography variant="h4" style={styles.amount}>{formatCurrency(item.amount)}</Typography>
+                        <Typography 
+                            variant="h4" 
+                            style={[
+                                styles.amount, 
+                                { color: item.type === "incoming" ? "#4CAF50" : theme.colors.text }
+                            ]}
+                        >
+                            {item.type === "incoming" ? "+" : "-"} {formatCurrency(item.amount)}
+                        </Typography>
                     </View>
                 )}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>
                         <Typography variant="body" style={styles.emptyText}>
-                            Nenhum gasto registrado neste dia
+                            Nenhum registro encontrado neste dia
                         </Typography>
                     </View>
                 }

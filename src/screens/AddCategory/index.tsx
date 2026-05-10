@@ -12,14 +12,22 @@ import FormFooter from "../../components/FormFooter";
 import FormBody from "../../components/FormBody";
 import Header from "../../components/Header";
 
+import Dropdown, { DropdownOption } from "../../components/Dropdown";
+
 export default function AddCategory() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const navigation = useNavigation();
 
+    const [type, setType] = useState<"incoming" | "outgoing">("outgoing");
     const [name, setName] = useState("");
     const [icon, setIcon] = useState("");
     const [color, setColor] = useState("");
+
+    const typeOptions: DropdownOption[] = [
+        { label: "Saída (Despesa)", value: "outgoing" },
+        { label: "Entrada (Receita)", value: "incoming" },
+    ];
 
     function handleAddCategory() {
         const trimmedName = name.trim();
@@ -34,6 +42,7 @@ export default function AddCategory() {
                 name: trimmedName,
                 icon: icon.trim() || "tag",
                 color: color.trim() || "#FFB700",
+                type: type,
             });
 
             navigation.goBack();
@@ -49,6 +58,13 @@ export default function AddCategory() {
             <Header title="Nova Categoria" onBack={navigation.goBack} />
 
             <FormBody>
+                <Dropdown
+                    label="Tipo de Categoria"
+                    options={typeOptions}
+                    value={type}
+                    onChange={(opt) => setType(opt.value as any)}
+                />
+
                 <TextField
                     label="Nome da Categoria"
                     placeholder="Ex: Alimentação"

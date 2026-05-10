@@ -6,7 +6,7 @@ import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
 import TextField from "../../components/TextField";
 import Dropdown, { DropdownOption } from "../../components/Dropdown";
-import { expensesRepository } from "../../database/repositories/expensesRepository";
+import { recordsRepository } from "../../database/repositories/recordsRepository";
 import { categoriesRepository } from "../../database/repositories/categoryRepository";
 import FormBody from "../../components/FormBody";
 import FormFooter from "../../components/FormFooter";
@@ -22,17 +22,23 @@ function todayISO(): string {
     return `${yyyy}-${mm}-${dd}`;
 }
 
-export default function AddExpense() {
+export default function AddRecord() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const navigation = useNavigation();
 
+    const [type, setType] = useState<"incoming" | "outgoing">("outgoing");
     const [name, setName] = useState("");
     const [amountText, setAmountText] = useState("");
     const [categoryId, setCategoryId] = useState("");
     const [categoryOptions, setCategoryOptions] = useState<DropdownOption[]>([]);
     const [repeat, setRepeat] = useState<string | null>(null);
     const [repeatUntil, setRepeatUntil] = useState<string | null>(null);
+
+    const typeOptions: DropdownOption[] = [
+        { label: "Saída (Despesa)", value: "outgoing" },
+        { label: "Entrada (Receita)", value: "incoming" },
+    ];
 
     const repeatOptions: DropdownOption[] = [
         { label: "Não se repete", value: "none" },
@@ -42,15 +48,19 @@ export default function AddExpense() {
     ];
 
     useEffect(() => {
-        const cats = categoriesRepository.getAll();
+        const cats = categoriesRepository.getByType(type);
         setCategoryOptions(cats.map((c) => ({ label: c.name, value: c.id })));
-        if (cats.length > 0) setCategoryId(cats[0].id);
-    }, []);
+        if (cats.length > 0) {
+            setCategoryId(cats[0].id);
+        } else {
+            setCategoryId("");
+        }
+    }, [type]);
 
-    function handleAddExpense() {
+    function handleAddRecord() {
         const trimmedName = name.trim();
         if (!trimmedName) {
-            Alert.alert("Campo obrigatório", "Informe o nome da despesa.");
+            Alert.alert("Campo obrigatório", "Informe o nome do registro.");
             return;
         }
 
@@ -66,13 +76,14 @@ export default function AddExpense() {
         }
 
         try {
-            expensesRepository.insert({
+            recordsRepository.insert({
                 id: String(Date.now()),
                 user_id: "1",
                 category_id: categoryId,
                 name: trimmedName,
                 description: "",
                 amount: parsed,
+                type: type,
                 date: todayISO(),
                 repeat: repeat === "none" ? null : (repeat as any),
                 repeat_until: repeat === "none" ? null : repeatUntil,
@@ -82,7 +93,7 @@ export default function AddExpense() {
 
             navigation.goBack();
         } catch (e) {
-            Alert.alert("Erro", "Não foi possível salvar a despesa. Tente novamente.");
+            Alert.alert("Erro", "Não foi possível salvar o registro. Tente novamente.");
             console.error(e);
         }
     }
@@ -90,12 +101,19 @@ export default function AddExpense() {
     return (
         <SafeAreaView style={styles.container}>
 
-            <Header title="Nova Despesa" onBack={navigation.goBack} />
+            <Header title="Novo Registro" onBack={navigation.goBack} />
 
             <FormBody>
+                <Dropdown
+                    label="Tipo de Registro"
+                    options={typeOptions}
+                    value={type}
+                    onChange={(opt) => setType(opt.value as any)}
+                />
+
                 <TextField
-                    label="Nome da Despesa"
-                    placeholder="Ex: Aluguel"
+                    label="Nome"
+                    placeholder={type === "outgoing" ? "Ex: Aluguel" : "Ex: Salário"}
                     value={name}
                     onChangeText={setName}
                     returnKeyType="next"
@@ -138,9 +156,9 @@ export default function AddExpense() {
 
 
             <FormFooter
-                textButton="Salvar Despesa"
+                textButton="Salvar Registro"
                 textCancel="Cancelar"
-                onPressButton={handleAddExpense}
+                onPressButton={handleAddRecord}
                 onPressCancel={() => navigation.goBack()}
             />
         </SafeAreaView>
