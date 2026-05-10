@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Alert, ScrollView, View } from "react-native";
+import { Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
-import Typography from "../../components/Typography";
 import TextField from "../../components/TextField";
-import Button from "../../components/Button";
 import Dropdown, { DropdownOption } from "../../components/Dropdown";
 import { expensesRepository } from "../../database/repositories/expensesRepository";
 import { categoriesRepository } from "../../database/repositories/categoryRepository";
 import FormBody from "../../components/FormBody";
-import FormHeader from "../../components/FormHeader";
 import FormFooter from "../../components/FormFooter";
+import Header from "../../components/Header";
 
 /** Retorna a data de hoje no formato YYYY-MM-DD (compatível com as queries do banco) */
 function todayISO(): string {
@@ -51,7 +49,6 @@ export default function AddExpense() {
             return;
         }
 
-        // Aceita vírgula ou ponto como separador decimal
         const parsed = parseFloat(amountText.replace(",", "."));
         if (isNaN(parsed) || parsed <= 0) {
             Alert.alert("Valor inválido", "Informe um valor maior que zero.");
@@ -81,7 +78,7 @@ export default function AddExpense() {
     return (
         <SafeAreaView style={styles.container}>
 
-            <FormHeader title="Nova Despesa" />
+            <Header title="Nova Despesa" onBack={navigation.goBack} />
 
             <FormBody>
                 <TextField

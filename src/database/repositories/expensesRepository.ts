@@ -119,4 +119,35 @@ export const expensesRepository = {
             [month]
         );
     },
+
+    getTotalByYear: (year: string): number => {
+        // formato: "2026"
+        const result = db.getFirstSync<{ total: number }>(
+            `SELECT SUM(amount) as total
+       FROM expenses
+       WHERE substr(date, 1, 4) = ?`,
+            [year]
+        );
+
+        return result?.total ?? 0;
+    },
+
+    getYearlyTotalsGroupedByMonth: (year: string): { month: string; total: number }[] => {
+        // formato: "2026"
+        return db.getAllSync<{ month: string; total: number }>(
+            `SELECT substr(date, 1, 7) as month, SUM(amount) as total
+       FROM expenses
+       WHERE substr(date, 1, 4) = ?
+       GROUP BY month
+       ORDER BY month ASC`,
+            [year]
+        );
+    },
+
+    getFirstExpenseDate: (): string | null => {
+        const result = db.getFirstSync<{ date: string }>(
+            `SELECT MIN(date) as date FROM expenses`
+        );
+        return result?.date ?? null;
+    },
 };

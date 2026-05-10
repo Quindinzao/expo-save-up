@@ -4,13 +4,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
+import { categoriesRepository } from "../../database/repositories/categoryRepository";
 import TextField from "../../components/TextField";
 import IconSelector from "../../components/IconSelector";
 import ColorSelector from "../../components/ColorSelector";
-import { categoriesRepository } from "../../database/repositories/categoryRepository";
 import FormFooter from "../../components/FormFooter";
-import FormHeader from "../../components/FormHeader";
 import FormBody from "../../components/FormBody";
+import Header from "../../components/Header";
 
 export default function AddCategory() {
     const { theme } = useTheme();
@@ -46,7 +46,7 @@ export default function AddCategory() {
     return (
         <SafeAreaView style={styles.container}>
 
-            <FormHeader title="Nova Categoria" />
+            <Header title="Nova Categoria" onBack={navigation.goBack} />
 
             <FormBody>
                 <TextField

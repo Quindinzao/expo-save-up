@@ -1,93 +1,104 @@
 import { useEffect, useState } from "react";
-import { FlatList, View } from "react-native";
+import { ScrollView, TouchableOpacity, View } from "react-native";
 import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
-import AccessButton from "../../components/AccessButton";
 import Typography from "../../components/Typography";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { expensesRepository } from "../../database/repositories/expensesRepository";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import BarChart from "../../components/BarChart";
 
-type DayEntry = { date: string; total: number };
-
-function formatDay(dateStr: string): string {
-    const [year, month, day] = dateStr.split("-");
-    const date = new Date(Number(year), Number(month) - 1, Number(day));
-    return date.toLocaleDateString("pt-BR", {
-        day: "2-digit",
-    });
-}
-
-function formatCurrency(value: number): string {
-    return value.toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL",
-    });
-}
+type MonthData = { month: string; total: number; label: string };
 
 export default function Home() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
-    const [days, setDays] = useState<DayEntry[]>([]);
+    const [yearlyData, setYearlyData] = useState<MonthData[]>([]);
+    const [maxTotal, setMaxTotal] = useState(0);
+    const [currentYear] = useState(new Date().getFullYear());
 
-    function loadDays() {
-        const month = new Date().toISOString().slice(0, 7); // "2026-04"
-        const result = expensesRepository.getDaysByMonth(month);
-        setDays(result);
+    function loadDashboardData() {
+        const yearStr = currentYear.toString();
+        const results = expensesRepository.getYearlyTotalsGroupedByMonth(yearStr);
+        
+        const data: MonthData[] = Array.from({ length: 12 }, (_, i) => {
+            const monthIndex = i + 1;
+            const monthStr = `${yearStr}-${monthIndex.toString().padStart(2, '0')}`;
+            const found = results.find(r => r.month === monthStr);
+            const date = new Date(currentYear, i);
+            return {
+                month: monthStr,
+                total: found ? found.total : 0,
+                label: date.toLocaleString("pt-BR", { month: "short" }).replace('.', '')
+            };
+        });
+
+        const max = Math.max(...data.map(d => d.total), 1); // avoid division by zero
+        setYearlyData(data);
+        setMaxTotal(max);
     }
 
     useEffect(() => {
-        const unsubscribe = navigation.addListener("focus", loadDays);
+        const unsubscribe = navigation.addListener("focus", loadDashboardData);
+        loadDashboardData();
         return unsubscribe;
     }, [navigation]);
 
-    const monthLabel = new Date().toLocaleString("pt-BR", { month: "long" });
-
     return (
         <SafeAreaView style={styles.container}>
-            <Typography variant="h1" style={styles.title}>
-                Despesas de {monthLabel}
-            </Typography>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
+                <View style={styles.header}>
+                    <Typography variant="body" style={styles.greeting}>Olá, bem-vindo ao</Typography>
+                    <Typography variant="h1" style={styles.title}>SaveUp</Typography>
+                </View>
 
-            <FlatList<DayEntry>
-                style={styles.list}
-                contentContainerStyle={days.length === 0 ? { flex: 1 } : styles.listContent}
-                data={days}
-                keyExtractor={(item) => item.date}
-                renderItem={({ item }) => (
-                    <AccessButton
-                        day={formatDay(item.date)}
-                        onPress={() => navigation.navigate("DailyExpenses", { date: item.date })}
-                    >
-                        {formatCurrency(item.total)}
-                    </AccessButton>
-                )}
-                ListEmptyComponent={
-                    <View style={styles.emptyContainer}>
-                        <Typography variant="body" style={styles.emptyText}>
-                            Nenhuma despesa este mês
-                        </Typography>
+                <BarChart 
+                    title={`Gastos de ${currentYear}`}
+                    data={yearlyData.map(d => ({ label: d.label, value: d.total }))}
+                    maxTotal={maxTotal}
+                    style={styles.chartSection}
+                />
+
+                <View style={styles.menuSection}>
+                    <View style={styles.menuGrid}>
+                        <TouchableOpacity 
+                            style={styles.menuItem} 
+                            onPress={() => navigation.navigate("MonthlyRecords")}
+                        >
+                            <MaterialCommunityIcons name="calendar-month" size={32} color={theme.colors.primary} style={styles.menuIcon} />
+                            <Typography variant="h4" style={styles.menuLabel}>Registros do Mês</Typography>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={styles.menuItem} 
+                            onPress={() => navigation.navigate("YearlyRecords")}
+                        >
+                            <MaterialCommunityIcons name="calendar-range" size={32} color={theme.colors.primary} style={styles.menuIcon} />
+                            <Typography variant="h4" style={styles.menuLabel}>Gastos do Ano</Typography>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={styles.menuItem} 
+                            onPress={() => navigation.navigate("AddExpense")}
+                        >
+                            <MaterialCommunityIcons name="cash-plus" size={32} color={theme.colors.primary} style={styles.menuIcon} />
+                            <Typography variant="h4" style={styles.menuLabel}>Adicionar Despesa</Typography>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity 
+                            style={styles.menuItem} 
+                            onPress={() => navigation.navigate("AddCategory")}
+                        >
+                            <MaterialCommunityIcons name="tag-plus" size={32} color={theme.colors.primary} style={styles.menuIcon} />
+                            <Typography variant="h4" style={styles.menuLabel}>Nova Categoria</Typography>
+                        </TouchableOpacity>
                     </View>
-                }
-            />
-
-            <View style={styles.footer}>
-                <AccessButton
-                    icon="cash-multiple"
-                    onPress={() => navigation.navigate("AddExpense")}
-                >
-                    Adicionar despesa
-                </AccessButton>
-                <AccessButton
-                    icon="tag-plus"
-                    onPress={() => navigation.navigate("AddCategory")}
-                >
-                    Nova categoria
-                </AccessButton>
-            </View>
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }

@@ -4,6 +4,9 @@ import Home from "../screens/Home";
 import AddExpense from "../screens/AddExpense";
 import AddCategory from "../screens/AddCategory";
 import DailyExpenses from "../screens/DailyExpenses";
+import MonthlyRecords from "../screens/MonthlyRecords";
+import YearlyRecords from "../screens/YearlyRecords";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +18,9 @@ export function Routes() {
                 <Stack.Screen name="AddExpense" component={AddExpense} />
                 <Stack.Screen name="AddCategory" component={AddCategory} />
                 <Stack.Screen name="DailyExpenses" component={DailyExpenses} />
+                <Stack.Screen name="MonthlyRecords" component={MonthlyRecords} />
+                <Stack.Screen name="YearlyRecords" component={YearlyRecords} />
+
             </Stack.Navigator>
         </NavigationContainer>
     )
