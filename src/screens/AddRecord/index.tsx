@@ -6,7 +6,7 @@ import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
 import TextField from "../../components/TextField";
 import Dropdown, { DropdownOption } from "../../components/Dropdown";
-import { recordsRepository } from "../../database/repositories/recordsRepository";
+import { recordsRepository, TransactionRecord } from "../../database/repositories/recordsRepository";
 import { categoriesRepository } from "../../database/repositories/categoryRepository";
 import FormBody from "../../components/FormBody";
 import FormFooter from "../../components/FormFooter";
@@ -26,16 +26,17 @@ export default function AddRecord() {
     const { theme } = useTheme();
     const styles = createStyles(theme);
     const navigation = useNavigation();
-    const route = useRoute<RouteProp<{ params: { date?: string } }>>();
+    const route = useRoute<RouteProp<{ params: { date?: string; record?: TransactionRecord } }>>();
+    const editingRecord = route.params?.record;
 
-    const [type, setType] = useState<"incoming" | "outgoing">("outgoing");
-    const [name, setName] = useState("");
-    const [amountText, setAmountText] = useState("");
-    const [categoryId, setCategoryId] = useState("");
+    const [type, setType] = useState<"incoming" | "outgoing">(editingRecord?.type || "outgoing");
+    const [name, setName] = useState(editingRecord?.name || "");
+    const [amountText, setAmountText] = useState(editingRecord?.amount ? editingRecord.amount.toString().replace(".", ",") : "");
+    const [categoryId, setCategoryId] = useState(editingRecord?.category_id || "");
     const [categoryOptions, setCategoryOptions] = useState<DropdownOption[]>([]);
-    const [date, setDate] = useState(route.params?.date || todayISO());
-    const [repeat, setRepeat] = useState<string | null>(null);
-    const [repeatUntil, setRepeatUntil] = useState<string | null>(null);
+    const [date, setDate] = useState(editingRecord?.date || route.params?.date || todayISO());
+    const [repeat, setRepeat] = useState<string | null>(editingRecord?.repeat || null);
+    const [repeatUntil, setRepeatUntil] = useState<string | null>(editingRecord?.repeat_until || null);
 
     const typeOptions: DropdownOption[] = [
         { label: "Saída (Despesa)", value: "outgoing" },
@@ -52,14 +53,16 @@ export default function AddRecord() {
     useEffect(() => {
         const cats = categoriesRepository.getByType(type);
         setCategoryOptions(cats.map((c) => ({ label: c.name, value: c.id })));
-        if (cats.length > 0) {
+        
+        // Se estivermos editando e o tipo não mudou, mantém a categoria atual
+        if (editingRecord && editingRecord.type === type && !categoryId) {
+            setCategoryId(editingRecord.category_id);
+        } else if (cats.length > 0 && !categoryId) {
             setCategoryId(cats[0].id);
-        } else {
-            setCategoryId("");
         }
     }, [type]);
 
-    function handleAddRecord() {
+    function handleSaveRecord() {
         const trimmedName = name.trim();
         if (!trimmedName) {
             Alert.alert("Campo obrigatório", "Informe o nome do registro.");
@@ -78,20 +81,33 @@ export default function AddRecord() {
         }
 
         try {
-            recordsRepository.insert({
-                id: String(Date.now()),
-                user_id: "1",
-                category_id: categoryId,
-                name: trimmedName,
-                description: "",
-                amount: parsed,
-                type: type,
-                date: date,
-                repeat: repeat === "none" ? null : (repeat as any),
-                repeat_until: repeat === "none" ? null : repeatUntil,
-                created_at: new Date().toISOString(),
-                edited_at: "",
-            });
+            if (editingRecord) {
+                recordsRepository.update({
+                    ...editingRecord,
+                    category_id: categoryId,
+                    name: trimmedName,
+                    amount: parsed,
+                    type: type,
+                    date: date,
+                    repeat: repeat === "none" ? null : (repeat as any),
+                    repeat_until: repeat === "none" ? null : repeatUntil,
+                });
+            } else {
+                recordsRepository.insert({
+                    id: String(Date.now()),
+                    user_id: "1",
+                    category_id: categoryId,
+                    name: trimmedName,
+                    description: "",
+                    amount: parsed,
+                    type: type,
+                    date: date,
+                    repeat: repeat === "none" ? null : (repeat as any),
+                    repeat_until: repeat === "none" ? null : repeatUntil,
+                    created_at: new Date().toISOString(),
+                    edited_at: "",
+                });
+            }
 
             navigation.goBack();
         } catch (e) {
@@ -100,10 +116,42 @@ export default function AddRecord() {
         }
     }
 
+    function handleDeleteRecord() {
+        if (!editingRecord) return;
+
+        Alert.alert(
+            "Excluir Registro",
+            "Tem certeza que deseja excluir este registro? Esta ação não pode ser desfeita.",
+            [
+                { text: "Cancelar", style: "cancel" },
+                { 
+                    text: "Excluir", 
+                    style: "destructive",
+                    onPress: () => {
+                        try {
+                            recordsRepository.delete(editingRecord.id);
+                            navigation.goBack();
+                        } catch (e) {
+                            Alert.alert("Erro", "Não foi possível excluir o registro.");
+                            console.error(e);
+                        }
+                    }
+                }
+            ]
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container}>
 
-            <Header title="Novo Registro" onBack={navigation.goBack} />
+            <Header 
+                title={editingRecord ? "Editar Registro" : "Novo Registro"} 
+                onBack={navigation.goBack} 
+                rightAction={editingRecord ? {
+                    icon: "trash-can-outline",
+                    onPress: handleDeleteRecord
+                } : undefined}
+            />
 
             <FormBody>
                 <Dropdown
@@ -164,9 +212,9 @@ export default function AddRecord() {
 
 
             <FormFooter
-                textButton="Salvar Registro"
+                textButton={editingRecord ? "Salvar Alterações" : "Salvar Registro"}
                 textCancel="Cancelar"
-                onPressButton={handleAddRecord}
+                onPressButton={handleSaveRecord}
                 onPressCancel={() => navigation.goBack()}
             />
         </SafeAreaView>

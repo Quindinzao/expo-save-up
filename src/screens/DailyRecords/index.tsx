@@ -1,24 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FlatList, View, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp, useFocusEffect } from "@react-navigation/native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
 import Typography from "../../components/Typography";
 import Button from "../../components/Button";
-import { recordsRepository } from "../../database/repositories/recordsRepository";
+import { recordsRepository, TransactionRecord } from "../../database/repositories/recordsRepository";
 import Header from "../../components/Header";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type DailyRecordsRouteProp = RouteProp<{ DailyRecords: { date: string } }, 'DailyRecords'>;
 
-interface RecordWithCategory {
-    id: string;
-    name: string;
-    amount: number;
-    type: "incoming" | "outgoing";
+interface RecordWithCategory extends TransactionRecord {
     category_name: string;
     category_icon: string;
     category_color: string;
@@ -50,14 +46,16 @@ export default function DailyRecords() {
 
     const [records, setRecords] = useState<RecordWithCategory[]>([]);
 
-    function loadRecords() {
+    const loadRecords = useCallback(() => {
         const result = recordsRepository.getByDate(date) as RecordWithCategory[];
         setRecords(result);
-    }
-
-    useEffect(() => {
-        loadRecords();
     }, [date]);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadRecords();
+        }, [loadRecords])
+    );
 
     return (
         <SafeAreaView style={styles.container}>
@@ -79,7 +77,11 @@ export default function DailyRecords() {
                 data={records}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <View style={styles.expenseItem}>
+                    <TouchableOpacity 
+                        style={styles.expenseItem}
+                        onPress={() => navigation.navigate("AddRecord", { record: item })}
+                        activeOpacity={0.7}
+                    >
                         <View style={[styles.iconContainer, { backgroundColor: item.category_color + '20' }]}>
                             <MaterialCommunityIcons
                                 name={item.category_icon as any}
@@ -100,7 +102,7 @@ export default function DailyRecords() {
                         >
                             {item.type === "incoming" ? "+" : "-"} {formatCurrency(item.amount)}
                         </Typography>
-                    </View>
+                    </TouchableOpacity>
                 )}
                 ListEmptyComponent={
                     <View style={styles.emptyContainer}>

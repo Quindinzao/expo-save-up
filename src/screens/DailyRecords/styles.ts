@@ -38,7 +38,7 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
         color: theme.colors.text,
     },
     listContent: {
-        paddingHorizontal: theme.spacing.s24,
+        paddingHorizontal: theme.spacing.s16,
         paddingBottom: theme.spacing.s32,
         gap: theme.spacing.s16,
     },
