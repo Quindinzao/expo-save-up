@@ -10,16 +10,17 @@
     "splash": {
       "image": "./src/assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#FFB700"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.joao-victor-fernandes.saveup"
+      "bundleIdentifier": "com.joao-victor-fernandes.saveup",
+      "backgroundColor": "#FFB700"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#FFB700"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,

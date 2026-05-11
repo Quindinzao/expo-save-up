@@ -230,4 +230,55 @@ export const recordsRepository = {
         );
         return result?.date ?? null;
     },
+
+    getRecordsByMonthWithCategories: (month: string) => {
+        const records = db.getAllSync<any>(
+            `SELECT r.*, c.name as category_name, c.icon as category_icon, c.color as category_color
+             FROM records r
+             LEFT JOIN categories c ON r.category_id = c.id
+             WHERE r.date <= ? || '-31'`,
+            [month]
+        );
+
+        const [targetYear, targetMonth] = month.split("-").map(Number);
+        const lastDay = new Date(targetYear, targetMonth, 0).getDate();
+        const endOfMonth = `${month}-${String(lastDay).padStart(2, "0")}`;
+
+        const monthRecords: any[] = [];
+
+        for (const r of records) {
+            const [rYear, rMonth, rDay] = r.date.split("-").map(Number);
+            let occurrences = 0;
+
+            if (!r.repeat) {
+                if (r.date.startsWith(month)) occurrences = 1;
+            } else if (r.repeat === "monthly") {
+                const occurrence = `${month}-${String(rDay).padStart(2, "0")}`;
+                if (r.date <= occurrence && occurrence <= endOfMonth && (!r.repeat_until || r.repeat_until >= occurrence)) {
+                    occurrences = 1;
+                }
+            } else if (r.repeat === "yearly") {
+                const occurrence = `${month}-${String(rDay).padStart(2, "0")}`;
+                if (r.date <= occurrence && rMonth === targetMonth && occurrence <= endOfMonth && (!r.repeat_until || r.repeat_until >= occurrence)) {
+                    occurrences = 1;
+                }
+            } else if (r.repeat === "daily") {
+                if (r.date <= endOfMonth && (!r.repeat_until || r.repeat_until >= `${month}-01`)) {
+                    const startDay = r.date.startsWith(month) ? rDay : 1;
+                    const endDay = r.repeat_until && r.repeat_until.startsWith(month) ? Number(r.repeat_until.split('-')[2]) : lastDay;
+                    occurrences = Math.max(0, Math.min(lastDay, endDay) - startDay + 1);
+                }
+            }
+
+            if (occurrences > 0) {
+                monthRecords.push({
+                    ...r,
+                    total_amount: r.amount * occurrences,
+                    occurrences
+                });
+            }
+        }
+
+        return monthRecords;
+    }
 };

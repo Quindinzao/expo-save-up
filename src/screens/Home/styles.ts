@@ -58,6 +58,35 @@ export const createStyles = (theme: Theme) => StyleSheet.create({
         fontSize: 10,
         color: theme.colors.placeholder,
     },
+    aiLabel: {
+        marginLeft: theme.spacing.s12,
+    },
+    aiCard: {
+        flexDirection: 'row',
+        backgroundColor: theme.colors.item,
+        borderRadius: theme.radius.md,
+        padding: theme.spacing.s16,
+        marginBottom: theme.spacing.s24,
+        borderWidth: 1,
+        borderColor: theme.colors.border,
+        alignItems: "center"
+    },
+    aiIcon: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: theme.colors.primary,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: theme.spacing.s12,
+    },
+    aiContent: {
+        flex: 1,
+    },
+    aiTitle: {
+        marginBottom: theme.spacing.s08,
+        color: theme.colors.text,
+    },
     menuSection: {
         paddingHorizontal: theme.spacing.s16,
     },

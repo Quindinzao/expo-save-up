@@ -83,6 +83,10 @@ export default function Home() {
                 />
 
                 <View style={styles.menuSection}>
+                    <TouchableOpacity onPress={() => navigation.navigate("FinancialInsights")} style={styles.aiCard}>
+                        <MaterialCommunityIcons name="robot" size={32} color={theme.colors.primary} style={styles.menuIcon} />
+                        <Typography variant="h4" style={styles.aiLabel}>IA Insights</Typography>
+                    </TouchableOpacity>
                     <View style={styles.menuGrid}>
                         <TouchableOpacity
                             style={styles.menuItem}
