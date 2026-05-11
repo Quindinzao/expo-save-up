@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { StyleProp, View, ViewStyle } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
 import Typography from "../Typography";
 import { createStyles } from "./styles";
@@ -9,13 +9,15 @@ interface FormFooterProps {
     textCancel?: string,
     onPressButton?: () => void,
     onPressCancel?: () => void,
+    style?: StyleProp<ViewStyle>
 }
 
 export default function FormFooter({
     textButton,
     textCancel,
     onPressButton,
-    onPressCancel
+    onPressCancel,
+    style
 }: FormFooterProps) {
     const { theme } = useTheme();
     const styles = createStyles(theme);

@@ -56,9 +56,9 @@ export default function OnboardingProfession() {
                 style={{ flex: 1, justifyContent: 'center' }}
             >
                 <View style={styles.content}>
-                    <View>
-                        <Typography variant="h1" style={styles.title}>Prazer, {name}!</Typography>
-                        <Typography variant="h2" style={styles.title}>Qual a sua profissão?</Typography>
+                    <View style={styles.titleBox}>
+                        <Typography variant="h1">Prazer, {name}!</Typography>
+                        <Typography variant="h2">Qual a sua profissão?</Typography>
                     </View>
 
                     <TextField

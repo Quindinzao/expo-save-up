@@ -30,7 +30,7 @@ export default function OnboardingName() {
                 style={{ flex: 1, justifyContent: 'center' }}
             >
                 <View style={styles.content}>
-                    <View>
+                    <View style={styles.titleBox}>
                         <Typography variant="h1">Olá!</Typography>
                         <Typography variant="h2">Como podemos te chamar?</Typography>
                     </View>
