@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.joao-victor-fernandes.saveup",
+      "bundleIdentifier": "com.quindinzao.saveup",
       "backgroundColor": "#FFB700"
     },
     "android": {
@@ -24,7 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.joaovictorfernandes.saveup"
+      "package": "com.quindinzao.saveup"
     },
     "web": {
       "favicon": "./src/assets/images/favicon.png"
@@ -32,6 +32,11 @@
     "plugins": [
       "expo-font",
       "expo-sqlite"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d67f706f-927c-43df-9b22-d18cffd94988"
+      }
+    }
   }
 }

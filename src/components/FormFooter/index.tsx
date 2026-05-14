@@ -1,6 +1,5 @@
 import { StyleProp, View, ViewStyle } from "react-native";
 import { useTheme } from "../../hooks/useTheme";
-import Typography from "../Typography";
 import { createStyles } from "./styles";
 import Button from "../Button";
 
