@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
 import AccessButton from "../../components/AccessButton";
 import Typography from "../../components/Typography";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { recordsRepository } from "../../database/repositories/recordsRepository";
 import Header from "../../components/Header";
@@ -43,18 +43,20 @@ export default function MonthlyRecords() {
     const [days, setDays] = useState<DayEntry[]>([]);
     const [monthTotals, setMonthTotals] = useState({ income: 0, outcome: 0 });
 
-    function loadData() {
+    const loadData = useCallback(() => {
         const monthStr = selectedDate.toISOString().slice(0, 7);
         const daysResult = recordsRepository.getDaysByMonth(monthStr);
         const totals = recordsRepository.getTotalsByMonth(monthStr);
 
         setDays(daysResult);
         setMonthTotals(totals);
-    }
-
-    useEffect(() => {
-        loadData();
     }, [selectedDate]);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadData();
+        }, [loadData])
+    );
 
     const changeMonth = (offset: number) => {
         const newDate = new Date(selectedDate);

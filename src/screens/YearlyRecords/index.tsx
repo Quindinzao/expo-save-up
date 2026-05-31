@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import { FlatList, View } from "react-native";
 import { createStyles } from "./styles";
 import { useTheme } from "../../hooks/useTheme";
 import AccessButton from "../../components/AccessButton";
 import Typography from "../../components/Typography";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { recordsRepository } from "../../database/repositories/recordsRepository";
 import Header from "../../components/Header";
@@ -55,7 +55,7 @@ export default function YearlyRecords() {
     const [months, setMonths] = useState<MonthEntry[]>([]);
     const [yearTotals, setYearTotals] = useState({ income: 0, outcome: 0 });
 
-    function loadData() {
+    const loadData = useCallback(() => {
         const yearStr = selectedYear.toString();
         const results = recordsRepository.getYearlyTotalsGroupedByMonth(yearStr);
 
@@ -74,11 +74,13 @@ export default function YearlyRecords() {
 
         setMonths(allMonths);
         setYearTotals({ income: totalIncome, outcome: totalOutcome });
-    }
-
-    useEffect(() => {
-        loadData();
     }, [selectedYear]);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadData();
+        }, [loadData])
+    );
 
     const changeYear = (offset: number) => {
         setSelectedYear(prev => prev + offset);
