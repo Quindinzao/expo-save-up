@@ -12,6 +12,7 @@ import FormBody from "../../components/FormBody";
 import FormFooter from "../../components/FormFooter";
 import Header from "../../components/Header";
 import DateField from "../../components/DateField";
+import { formatCurrency } from "../../utils/masks";
 
 /** Retorna a data de hoje no formato YYYY-MM-DD (compatível com as queries do banco) */
 function todayISO(): string {
@@ -31,7 +32,7 @@ export default function AddRecord() {
 
     const [type, setType] = useState<"incoming" | "outgoing">(editingRecord?.type || "outgoing");
     const [name, setName] = useState(editingRecord?.name || "");
-    const [amountText, setAmountText] = useState(editingRecord?.amount ? editingRecord.amount.toString().replace(".", ",") : "");
+    const [amountText, setAmountText] = useState(editingRecord?.amount ? formatCurrency(editingRecord.amount.toFixed(2)) : "");
     const [categoryId, setCategoryId] = useState(editingRecord?.category_id || "");
     const [categoryOptions, setCategoryOptions] = useState<DropdownOption[]>([]);
     const [date, setDate] = useState(editingRecord?.date || route.params?.date || todayISO());
@@ -74,7 +75,7 @@ export default function AddRecord() {
             return;
         }
 
-        const parsed = parseFloat(amountText.replace(",", "."));
+        const parsed = parseFloat(amountText.replace(/\./g, "").replace(",", "."));
         if (isNaN(parsed) || parsed <= 0) {
             Alert.alert("Valor inválido", "Informe um valor maior que zero.");
             return;
@@ -172,7 +173,8 @@ export default function AddRecord() {
                 <TextField
                     label="Valor (R$)"
                     placeholder="0,00"
-                    keyboardType="decimal-pad"
+                    keyboardType="number-pad"
+                    mask="currency"
                     value={amountText}
                     onChangeText={setAmountText}
                     returnKeyType="done"
